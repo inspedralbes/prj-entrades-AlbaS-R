@@ -1,0 +1,89 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: db_StarMovie
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: StarMovie
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: star_user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_StarMovie
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  redis:
+    image: redis:alpine
+    container_name: redis_StarMovie
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  front:
+    build:
+      context: ./front
+      dockerfile: dockerfile.dev
+    container_name: front_StarMovie
+    restart: unless-stopped
+    environment:
+      - HOST=0.0.0.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+
+  api:
+    build:
+      context: ./back/api
+      dockerfile: dockerfile.dev
+    container_name: laravel_StarMovie
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./back/api:/app
+      - /app/vendor
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+
+  websockets:
+    build:
+      context: ./back/websockets
+      dockerfile: dockerfile.dev
+    container_name: nodejs_StarMovie
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./back/websockets:/app
+      - /app/node_modules
+    depends_on:
+      - rabbitmq
+      - redis
+
+  adminer:
+    image: adminer
+    container_name: adminer_StarMovie
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
