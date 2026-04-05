@@ -57,13 +57,13 @@ class CinemaSeeder extends Seeder
                 $files = ($capacitat === 20) ? 4 : 5;
                 $seientsPerFila = ($capacitat === 20) ? 5 : 10;
 
-                for($i = 1; $i <= $files; $f++){
-                    for($j =1; $s <= $seientsPerFila; $s++){
-                        Seient::firstorCreate([
+                for ($f = 1; $f <= $files; $f++) {
+                    for ($s = 1; $s <= $seientsPerFila; $s++) {
+                        Seient::firstOrCreate([
 
                             'sala_id' => $sala->id,
-                            'fila' => $i,
-                            'seient' => $j
+                            'fila_seient' => $f,
+                            'nombre_seient' => $s
 
                         ]);
                     }
