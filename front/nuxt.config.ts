@@ -4,5 +4,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
     '@pinia/nuxt'
-  ]
+  ],
+  vite: {
+    server: {
+      watch: {
+        usePolling: true
+      }
+    }
+  }
 })
