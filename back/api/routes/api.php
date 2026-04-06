@@ -25,7 +25,8 @@ Route::get('/pelicules/{id}', [PeliculaController::class, 'show']);
 
 // Horaris i Sales (Sessions)
 Route::get('/sessions', [SessioController::class, 'index']);
-Route::get('/sessions/{id}', [SessioController::class, 'show']); // Retorna sessio + mapa de seients!
+Route::get('/sessions/{id}', [SessioController::class, 'show']);
 
-// Venda d'Entrades
+// Rutes per a usuaris registrats i gestió d'entrades
 Route::post('/entrades', [EntradaController::class, 'store']);
+Route::get('/entrades/usuari/{id}', [EntradaController::class, 'lesMevesEntrades']);

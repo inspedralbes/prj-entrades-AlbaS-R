@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class EntradaController extends Controller
 {
-    // Funció per verificar l'ocupació i comprar el tiquet!
+    // Verifica l'ocupació vigent de la butaca i emmagatzema l'entrada objectiva
     public function store(Request $request)
     {
         $request->validate([
@@ -17,19 +17,19 @@ class EntradaController extends Controller
             'seient_id' => 'required|exists:seients,id',
         ]);
 
-        // Evitem el desastre: Comprovem que algú no ens hagi pres el lloc un segon abans!
+        // Verificació d'estat de seient prèvia per mantenir nivell de concurrència segur.
         $estaOcupat = Entrada::where('sessio_id', $request->sessio_id)
                              ->where('seient_id', $request->seient_id)
                              ->exists();
 
         if ($estaOcupat) {
-            // Retornem error HTTP 400 avisant al javascript que cancel·li l'operació
+            // Emissió d'error 400 per seient no disponible en l'instant de transacció.
             return response()->json([
-                'message' => 'Quin greu! Aquest seient acaba de ser ocupat per algú altre.'
+                'message' => 'El seient especificat ja no es troba disponible.'
             ], 400);
         }
 
-        // Si tot és lliure, creem l'Entrada!
+        // Creació oficial del document d'entrada vinculat.
         $entrada = Entrada::create([
             'usuari_id' => $request->usuari_id,
             'sessio_id' => $request->sessio_id,
@@ -38,8 +38,18 @@ class EntradaController extends Controller
         ]);
 
         return response()->json([
-            'message' => "Perfecte! L'entrada és teva.",
+            'message' => 'Transacció acceptada i processada correctament.',
             'entrada' => $entrada
         ], 201);
+    }
+    
+    public function lesMevesEntrades($id)
+    {
+        // Recuperació integral de l'històric d'adquisicions client 
+        $entrades = Entrada::where('usuari_id', $id)
+            ->with(['sessio.pelicula', 'sessio.sala', 'seient'])
+            ->get();
+            
+        return response()->json($entrades);
     }
 }

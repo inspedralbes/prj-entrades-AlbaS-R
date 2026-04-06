@@ -1,93 +1,112 @@
 <template>
   <div>
-    <h1>Benvinguts a StarMovie Cartellera!</h1>
-    
-    <div v-if="cinemaStore.carregant">
-      <p>Carregant dades fresques de la nostra base de dades...</p>
+    <!-- Navegació principal -->
+    <div class="nav-header">
+      <h1>StarMovie</h1>
+      
+      <nav class="links-router">
+        <!-- Enllaços de navegació a les diferents seccions -->
+        <NuxtLink to="/usuario" class="nav-item">Cartellera General</NuxtLink>
+        <NuxtLink v-if="authStore.usuariActual" to="/usuario/entrades" class="nav-item">Les meves reserves</NuxtLink>
+        <NuxtLink v-if="authStore.usuariActual?.is_admin" to="/admin" class="nav-item" style="color: #00ff88;">Gestió Admin</NuxtLink>
+      </nav>
+
+      <div>
+        <span v-if="authStore.usuariActual">
+          Hola, <strong>{{ authStore.usuariActual.name }}</strong> 
+          <button class="logout-btn" @click="authStore.ferLogout()">Tancar Sessió</button>
+        </span>
+        <button class="login-btn" v-else @click="authStore.mostrarModal = true">Inicia sessió / Registre</button>
+      </div>
     </div>
     
-    <!-- PAS 1: MOSTRAR CARTELLERA -->
-    <div v-else-if="vistaActual === 'cartellera'">
-      <h2>La nostra Cartellera Completa</h2>
-      <ul>
-        <!-- Modifiquem el v-for per pintar cada pel·lícula -->
-        <li v-for="pelicula in cinemaStore.pelicules" :key="pelicula.id">
-          <h3>{{ pelicula.titol }} ({{ pelicula.any }})</h3>
-          <p><strong>Gènere:</strong> {{ pelicula.genere }} | <strong>Durada:</strong> {{ pelicula.durada }}</p>
-          <img :src="pelicula.imatge_url" :alt="pelicula.titol" height="150" />
-          <br><br>
-          <button @click="seleccionarPelicula(pelicula)">Veure Sessions d'aquesta Peli</button>
-          <hr />
-        </li>
-      </ul>
+    <div class="app-container">
+        <!-- Contenidor dinàmic per a vistes inferiors de rutes de Vue Router -->
+        <NuxtPage />
     </div>
 
-    <!-- PAS 2: MOSTRAR SESSIONS DE LA PELI SELECCIONADA -->
-    <div v-else-if="vistaActual === 'sessions'">
-      <button @click="vistaActual = 'cartellera'">⬅ Tornar a la cartellera</button>
-      <h2>Sessions per: {{ peliculaActiva?.titol }}</h2>
-      
-      <p v-if="cinemaStore.sessions.length === 0">Ooops! No hi ha sessions programades per aquesta pel·lícula. Tries una altra?</p>
-      
-      <ul>
-        <li v-for="sessio in cinemaStore.sessions" :key="sessio.id">
-          <p><strong>Dia i Hora:</strong> {{ sessio.data_hora }} </p>
-          <p><strong>Sala:</strong> {{ sessio.sala.nom }} ({{ sessio.sala.nom === 'Sala VIP' ? 'BUTACA DE LUXE' : 'Estàndard' }})</p>
-          <p><strong>Preu:</strong> {{ sessio.preu }} €</p>
-          <button @click="seleccionarSessio(sessio.id)">Tria els Seients</button>
-          <hr />
-        </li>
-      </ul>
-    </div>
-
-    <!-- PAS 3: PASSAREL·LA DE SEIENTS -->
-    <div v-else-if="vistaActual === 'seients'">
-      <button @click="vistaActual = 'sessions'">⬅ Tornar a horaris</button>
-      <h2>Escull el teu lloc! ({{ cinemaStore.sessioActiva?.sala?.nom }})</h2>
-      
-      <!-- Pintem els seients súper cutrement en llista d'HTML pur -->
-      <ul>
-        <li v-for="seient in cinemaStore.seients" :key="seient.id">
-          Fila: {{ seient.fila_seient }} - Seient: {{ seient.nombre_seient }}
-          
-          <span v-if="seient.ocupat" style="color: red; margin-left: 10px;">❌ OCUPAT</span>
-          <button v-else style="color: green; margin-left: 10px;" @click="comprarSeient(seient)">Lliure! COMPRAR 🎟</button>
-        </li>
-      </ul>
-    </div>
+    <!-- Modal d'autenticació gestionat per l'estat global -->
+    <AuthModal 
+        v-if="authStore.mostrarModal" 
+        @tancar="authStore.mostrarModal = false" 
+        @identificat="authStore.mostrarModal = false"
+    />
 
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import { useCinemaStore } from '../stores/cinemaStore';
-
-const cinemaStore = useCinemaStore();
-
-// Amb això controlem quina "pantalla" estem mostrant!
-const vistaActual = ref('cartellera'); // Pot ser: 'cartellera', 'sessions', 'seients'
-const peliculaActiva = ref(null);
-
-onMounted(() => {
-  cinemaStore.fetchPelicules();
-});
-
-// Quan l'usuari clica al botó de "Veure sessions" d'una pel·lícula
-const seleccionarPelicula = async (pelicula) => {
-  peliculaActiva.value = pelicula;
-  await cinemaStore.fetchSessions(pelicula.id); // Traguem totes les sessions!
-  vistaActual.value = 'sessions'; // Canviem la pantalla "com per art de màgia" sense refrescar el navegador!
-};
-
-// Quan l'usuari clica sobre en un horari en concret
-const seleccionarSessio = async (sessioId) => {
-  await cinemaStore.fetchSeients(sessioId);
-  vistaActual.value = 'seients';
-};
-
-const comprarSeient = (seient) => {
-  alert(`Perfecte! Acabes de reservar un bitllet per a la FILA ${seient.fila_seient}, BUTACA ${seient.nombre_seient}. Ara et demanarem login.`);
-  // Aquí aviat hi muntarem l'script que cridi al teu EntradaController php de Laravel.
-};
+import { useAuthStore } from '../stores/authStore';
+const authStore = useAuthStore();
 </script>
+
+<style>
+/* Estils globals d'aplicació */
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+}
+button {
+  cursor: pointer;
+}
+</style>
+
+<style scoped>
+.nav-header {
+  background-color: #111;
+  color: #fff;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.links-router {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-item {
+  color: #ccc;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.nav-item:hover, .nav-item.router-link-active {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+.logout-btn, .login-btn {
+  margin-left: 15px;
+  background-color: #fff;
+  color: #111;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover, .login-btn:hover {
+  background-color: #eee;
+}
+
+.app-container {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+</style>

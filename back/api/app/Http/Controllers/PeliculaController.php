@@ -9,8 +9,8 @@ class PeliculaController extends Controller
     // Llista tota la cartellera
     public function index()
     {
-        // Retorna totes les pelis amb tota la seva info en format JSON
-        $pelicules = Pelicula::all();
+        // Retorna exclusivament les pelis que tinguin 1 o més Sessions pre-assignades
+        $pelicules = Pelicula::has('sessions')->get();
         
         return response()->json($pelicules);
     }
