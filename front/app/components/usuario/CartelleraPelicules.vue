@@ -1,20 +1,52 @@
 <template>
   <div class="contenidor-principal">
     <div class="contenidor-titol">
+      <div class="grup-neons-wrapper esquerra">
+        <div class="grup-neons-esq">
+          <div class="tub-curb tub-1 rosa"></div>
+          <div class="tub-curb tub-2 blau"></div>
+          <div class="tub-curb tub-3 groc"></div>
+          <div class="tub-curb tub-4 verd"></div>
+        </div>
+      </div>
       <h2 class="titol-cartellera">CARTELLERA</h2>
+      <div class="grup-neons-wrapper dreta">
+        <div class="grup-neons-dreta">
+          <div class="tub-curb tub-1 rosa"></div>
+          <div class="tub-curb tub-2 blau"></div>
+          <div class="tub-curb tub-3 groc"></div>
+          <div class="tub-curb tub-4 verd"></div>
+        </div>
+      </div>
     </div>
 
     <div class="tauler">
       <ul class="llista-pelicules">
-        <li v-for="pelicula in cinemaStore.pelicules" :key="pelicula.id" class="targeta-pelicula">
-          <img :src="pelicula.imatge_url" :alt="pelicula.titol" class="imatge-pelicula" />
+        <li
+          v-for="pelicula in cinemaStore.pelicules"
+          :key="pelicula.id"
+          class="targeta-pelicula"
+        >
+          <div class="imatge-pelicula-wrapper">
+            <img
+              :src="pelicula.imatge_url"
+              :alt="pelicula.titol"
+              class="imatge-pelicula"
+            />
+          </div>
 
           <div class="info-pelicula">
-            <span class="etiqueta-pantalla">ARA A LA PANTALLA</span>
             <h3 class="titol-pelicula">{{ pelicula.titol }}</h3>
-            <p class="dades-pelicula">{{ pelicula.any }} | {{ pelicula.durada }}</p>
+            <p class="dades-pelicula">
+              {{ pelicula.any }} | {{ pelicula.durada }}
+            </p>
             <p class="descripcio-pelicula">{{ pelicula.genere }}</p>
-            <button class="boto-comprar" @click="$emit('seleccioPelicula', pelicula)">COMPRAR ENTRADES</button>
+            <button
+              class="boto-comprar"
+              @click="$emit('seleccioPelicula', pelicula)"
+            >
+              COMPRAR ENTRADES
+            </button>
           </div>
         </li>
       </ul>
@@ -23,16 +55,16 @@
 </template>
 
 <script setup>
-import { useCinemaStore } from '../../../stores/cinemaStore';
+import { useCinemaStore } from "../../../stores/cinemaStore";
 const cinemaStore = useCinemaStore();
 
-defineEmits(['seleccioPelicula']);
+defineEmits(["seleccioPelicula"]);
 </script>
 
 <style scoped>
 @font-face {
-  font-family: 'VintageFont';
-  src: url('/fonts/neon_light/NeonLight-Regular.ttf') format('truetype');
+  font-family: "VintageFont";
+  src: url("/fonts/neon_light/NeonLight-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
@@ -47,36 +79,145 @@ defineEmits(['seleccioPelicula']);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 30px;
-  margin-bottom: 40px;
+  gap: 20px;
   padding: 0 20px;
 }
 
 .titol-cartellera {
   color: #fffffff6;
-  font-family: 'VintageFont';
+  font-family: "VintageFont";
   font-size: 6rem;
   letter-spacing: 4px;
-  margin: 0;
-  text-shadow: 0 0 5px #fff45f00, 0 0 15px #fff45f, 0 0 30px #ffeb79, 0 0 50px #ffe9a2;
+  margin-bottom: 150px;
+  text-shadow:
+    0 0 5px #fff45f00,
+    0 0 15px #fff45f,
+    0 0 30px #ffeb79,
+    0 0 50px #ffe9a2;
   text-transform: uppercase;
   white-space: nowrap;
+  position: relative;
+  z-index: 2;
 }
 
+.grup-neons-wrapper {
+  position: relative;
+  width: 0;
+  height: 0;
+}
 
+.grup-neons-esq,
+.grup-neons-dreta {
+  position: absolute;
+  z-index: -1;
+}
+
+.grup-neons-esq {
+  right: -10px;
+}
+
+.grup-neons-dreta {
+  left: -10px;
+}
+
+.tub-curb {
+  position: absolute;
+  border-top: 4px solid;
+  height: 400px;
+  border-bottom: none;
+  opacity: 0.95;
+  mix-blend-mode: screen;
+}
+
+/* ESQUERRA */
+.grup-neons-esq .tub-curb {
+  right: 0;
+  border-left: 4px solid;
+  border-right: none;
+}
+.grup-neons-esq .tub-1 {
+  width: 180px;
+  top: -30px;
+  border-radius: 40px 0 0 0;
+}
+.grup-neons-esq .tub-2 {
+  width: 170px;
+  top: -20px;
+  border-radius: 30px 0 0 0;
+}
+.grup-neons-esq .tub-3 {
+  width: 160px;
+  top: -10px;
+  border-radius: 20px 0 0 0;
+}
+.grup-neons-esq .tub-4 {
+  width: 150px;
+  top: 0px;
+  border-radius: 10px 0 0 0;
+}
+
+/* DRETA */
+.grup-neons-dreta .tub-curb {
+  left: 0;
+  border-right: 4px solid;
+  border-left: none;
+}
+.grup-neons-dreta .tub-1 {
+  width: 180px;
+  top: -30px;
+  border-radius: 0 40px 0 0;
+}
+.grup-neons-dreta .tub-2 {
+  width: 170px;
+  top: -20px;
+  border-radius: 0 30px 0 0;
+}
+.grup-neons-dreta .tub-3 {
+  width: 160px;
+  top: -10px;
+  border-radius: 0 20px 0 0;
+}
+.grup-neons-dreta .tub-4 {
+  width: 150px;
+  top: 0px;
+  border-radius: 0 10px 0 0;
+}
+
+.tub-curb.rosa {
+  border-color: #ff66cc;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ff00aa)
+    drop-shadow(0 0 20px #ff00aa);
+}
+
+.tub-curb.blau {
+  border-color: #66ffff;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00f3ff)
+    drop-shadow(0 0 20px #00f3ff);
+}
+
+.tub-curb.groc {
+  border-color: #ffff66;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ffea00)
+    drop-shadow(0 0 20px #ffea00);
+}
+
+.tub-curb.verd {
+  border-color: #66ff66;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00ff00)
+    drop-shadow(0 0 20px #00ff00);
+}
 
 .tauler {
-  background: #2b1d14;
-  background-image: repeating-linear-gradient(to bottom,
-      rgba(0, 0, 0, 0.1),
-      rgba(0, 0, 0, 0.1) 5px,
-      rgba(0, 0, 0, 0.5) 5px,
-      rgba(0, 0, 0, 0.5) 15px);
-  border: 15px solid #4a2e1b;
-  border-radius: 10px;
-  box-shadow: inset 0 0 40px #000, 0 20px 40px rgba(0, 0, 0, 0.9);
+  background: #08080c;
+  border: 15px groove;
+  border-image: url("/imgclient/textura2.jpg") 30 stretch;
+  box-shadow:
+    inset 0 8px 20px rgba(0, 0, 0, 0.8),
+    0 15px 30px rgba(0, 0, 0, 0.5);
   padding: 40px;
   position: relative;
+  z-index: 10;
+  margin-top: -70px;
 }
 
 .tauler::before {
@@ -95,7 +236,7 @@ defineEmits(['seleccioPelicula']);
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 40px;
   position: relative;
   z-index: 1;
@@ -105,50 +246,72 @@ defineEmits(['seleccioPelicula']);
   background: #08080c;
   border: 2px solid #00f3ff;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
-  overflow: hidden;
+  box-shadow:
+    0 0 15px rgba(0, 243, 255, 0.4),
+    inset 0 0 15px rgba(0, 243, 255, 0.2);
   display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  flex-direction: row;
+  align-items: stretch;
+  padding: 20px;
+  gap: 20px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .targeta-pelicula:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0, 243, 255, 0.8), inset 0 0 15px rgba(0, 243, 255, 0.4);
+  box-shadow:
+    0 6px 20px rgba(0, 243, 255, 0.8),
+    inset 0 0 15px rgba(0, 243, 255, 0.4);
+}
+
+.imatge-pelicula-wrapper {
+  flex-shrink: 0;
+  border: 2px solid #ff00aa;
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow:
+    0 0 10px rgba(255, 0, 170, 0.6),
+    inset 0 0 10px rgba(255, 0, 170, 0.4);
+  background: #08080c;
+  display: flex;
+  align-items: center;
 }
 
 .imatge-pelicula {
-  width: 100%;
-  height: 380px;
+  width: 200px;
+  height: 290px;
   object-fit: cover;
-  border-bottom: 2px solid rgba(0, 243, 255, 0.4);
+  border-radius: 4px;
+  display: block;
 }
 
 .info-pelicula {
-  padding: 25px 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  text-align: center;
+  justify-content: center;
+  text-align: left;
   flex-grow: 1;
-  gap: 10px;
+  gap: 8px;
 }
 
 .etiqueta-pantalla {
   color: #fff;
   font-size: 0.8rem;
   font-weight: bold;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .titol-pelicula {
   color: #00f3ff;
-  text-shadow: 0 0 5px #00f3ff, 0 0 15px #00f3ff;
-  font-size: 1.5rem;
-  margin: 5px 0;
+  text-shadow:
+    0 0 5px #00f3ff,
+    0 0 15px #00f3ff;
+  font-size: 1.6rem;
+  margin: 0;
   text-transform: uppercase;
-  font-family: 'Trebuchet MS', Arial, sans-serif;
+  font-family: "Trebuchet MS", Arial, sans-serif;
   letter-spacing: 1px;
 }
 
@@ -163,32 +326,41 @@ defineEmits(['seleccioPelicula']);
 
 .descripcio-pelicula {
   color: #aaa;
-  font-size: 0.9rem;
-  margin-top: 5px;
-  margin-bottom: 20px;
+  font-size: 0.85rem;
+  margin: 0;
   flex-grow: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .boto-comprar {
   background-color: transparent;
   color: #ff00aa;
   border: 2px solid #ff00aa;
-  padding: 12px 20px;
+  padding: 10px 24px;
   border-radius: 30px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   cursor: pointer;
-  box-shadow: 0 0 10px #ff00aa, inset 0 0 10px #ff00aa;
+  box-shadow:
+    0 0 10px #ff00aa,
+    inset 0 0 10px #ff00aa;
   text-shadow: 0 0 5px #ff00aa;
   transition: all 0.3s ease;
-  width: 100%;
+  align-self: flex-start;
+  margin-top: auto;
 }
 
 .boto-comprar:hover {
   background-color: #ff00aa;
   color: #fff;
-  box-shadow: 0 0 20px #ff00aa, inset 0 0 15px #ff00aa;
+  box-shadow:
+    0 0 20px #ff00aa,
+    inset 0 0 15px #ff00aa;
   text-shadow: none;
 }
 </style>
