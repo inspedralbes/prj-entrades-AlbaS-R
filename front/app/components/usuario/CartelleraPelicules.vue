@@ -22,17 +22,9 @@
 
     <div class="tauler">
       <ul class="llista-pelicules">
-        <li
-          v-for="pelicula in cinemaStore.pelicules"
-          :key="pelicula.id"
-          class="targeta-pelicula"
-        >
+        <li v-for="pelicula in cinemaStore.pelicules" :key="pelicula.id" class="targeta-pelicula">
           <div class="imatge-pelicula-wrapper">
-            <img
-              :src="pelicula.imatge_url"
-              :alt="pelicula.titol"
-              class="imatge-pelicula"
-            />
+            <img :src="pelicula.imatge_url" :alt="pelicula.titol" class="imatge-pelicula" />
           </div>
 
           <div class="info-pelicula">
@@ -41,10 +33,7 @@
               {{ pelicula.any }} | {{ pelicula.durada }}
             </p>
             <p class="descripcio-pelicula">{{ pelicula.genere }}</p>
-            <button
-              class="boto-comprar"
-              @click="$emit('seleccioPelicula', pelicula)"
-            >
+            <button class="boto-comprar" @click="$emit('seleccioPelicula', pelicula)">
               COMPRAR ENTRADES
             </button>
           </div>
@@ -69,10 +58,30 @@ defineEmits(["seleccioPelicula"]);
   font-style: normal;
 }
 
+@font-face {
+  font-family: "NormalFont";
+  src: url("/fonts/tt-directors-demo.bl-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MovingFont";
+  src: url("/fonts/moving.regular.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "ContentForm";
+  src: url("/fonts/black-writing.regular.ttf");
+}
+
 .contenidor-principal {
   padding: 20px 0 60px 0;
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: -100px;
 }
 
 .contenidor-titol {
@@ -80,6 +89,7 @@ defineEmits(["seleccioPelicula"]);
   align-items: center;
   justify-content: center;
   gap: 20px;
+
   padding: 0 20px;
 }
 
@@ -88,7 +98,7 @@ defineEmits(["seleccioPelicula"]);
   font-family: "VintageFont";
   font-size: 6rem;
   letter-spacing: 4px;
-  margin-bottom: 150px;
+  margin-bottom: 130px;
   text-shadow:
     0 0 5px #fff45f00,
     0 0 15px #fff45f,
@@ -135,25 +145,29 @@ defineEmits(["seleccioPelicula"]);
   border-left: 4px solid;
   border-right: none;
 }
+
 .grup-neons-esq .tub-1 {
-  width: 180px;
+  width: 270px;
   top: -30px;
   border-radius: 40px 0 0 0;
 }
+
 .grup-neons-esq .tub-2 {
-  width: 170px;
+  width: 260px;
   top: -20px;
   border-radius: 30px 0 0 0;
 }
+
 .grup-neons-esq .tub-3 {
-  width: 160px;
+  width: 250px;
   top: -10px;
   border-radius: 20px 0 0 0;
 }
+
 .grup-neons-esq .tub-4 {
-  width: 150px;
+  width: 240px;
   top: 0px;
-  border-radius: 10px 0 0 0;
+  border-radius: 13px 0 0 0;
 }
 
 /* DRETA */
@@ -162,62 +176,62 @@ defineEmits(["seleccioPelicula"]);
   border-right: 4px solid;
   border-left: none;
 }
+
 .grup-neons-dreta .tub-1 {
-  width: 180px;
+  width: 270px;
   top: -30px;
   border-radius: 0 40px 0 0;
 }
+
 .grup-neons-dreta .tub-2 {
-  width: 170px;
+  width: 260px;
   top: -20px;
   border-radius: 0 30px 0 0;
 }
+
 .grup-neons-dreta .tub-3 {
-  width: 160px;
+  width: 250px;
   top: -10px;
   border-radius: 0 20px 0 0;
 }
+
 .grup-neons-dreta .tub-4 {
-  width: 150px;
+  width: 240px;
   top: 0px;
-  border-radius: 0 10px 0 0;
+  border-radius: 0 13px 0 0;
 }
 
 .tub-curb.rosa {
   border-color: #ff66cc;
-  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ff00aa)
-    drop-shadow(0 0 20px #ff00aa);
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ff00aa) drop-shadow(0 0 20px #ff00aa);
 }
 
 .tub-curb.blau {
   border-color: #66ffff;
-  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00f3ff)
-    drop-shadow(0 0 20px #00f3ff);
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00f3ff) drop-shadow(0 0 20px #00f3ff);
 }
 
 .tub-curb.groc {
   border-color: #ffff66;
-  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ffea00)
-    drop-shadow(0 0 20px #ffea00);
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ffea00) drop-shadow(0 0 20px #ffea00);
 }
 
 .tub-curb.verd {
   border-color: #66ff66;
-  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00ff00)
-    drop-shadow(0 0 20px #00ff00);
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00ff00) drop-shadow(0 0 20px #00ff00);
 }
 
 .tauler {
-  background: #08080c;
+  background: rgb(29, 28, 26);
   border: 15px groove;
   border-image: url("/imgclient/textura2.jpg") 30 stretch;
   box-shadow:
-    inset 0 8px 20px rgba(0, 0, 0, 0.8),
-    0 15px 30px rgba(0, 0, 0, 0.5);
+    inset 0 8px 20px rgba(26, 23, 21, 0.856),
+    0 20px 25px 10px rgb(0, 0, 0);
   padding: 40px;
   position: relative;
   z-index: 10;
-  margin-top: -70px;
+  margin-top: -80px;
 }
 
 .tauler::before {
@@ -283,8 +297,8 @@ defineEmits(["seleccioPelicula"]);
   width: 200px;
   height: 290px;
   object-fit: cover;
-  border-radius: 4px;
   display: block;
+  border: solid #ffffff;
 }
 
 .info-pelicula {
@@ -294,39 +308,41 @@ defineEmits(["seleccioPelicula"]);
   text-align: left;
   flex-grow: 1;
   gap: 8px;
+  font-family: "MovingFont";
 }
 
 .etiqueta-pantalla {
   color: #fff;
   font-size: 0.8rem;
   font-weight: bold;
-  letter-spacing: 1px;
+  letter-spacing: 20px;
 }
 
 .titol-pelicula {
-  color: #00f3ff;
+  color: #00f2ff00;
   text-shadow:
-    0 0 5px #00f3ff,
-    0 0 15px #00f3ff;
-  font-size: 1.6rem;
+    0 0 15px rgb(0, 243, 255);
+  font-size: 2.5rem;
   margin: 0;
   text-transform: uppercase;
-  font-family: "Trebuchet MS", Arial, sans-serif;
+  font-weight: 1;
+  font-family: "MovingFont";
+  -webkit-text-stroke: 2px rgb(0, 243, 255);
   letter-spacing: 1px;
 }
 
 .dades-pelicula {
   color: #ffea00;
-  text-shadow: 0 0 5px #ffea00;
-  font-size: 0.95rem;
-  font-weight: bold;
+  font-family: "MovingFont";
+  font-size: 1.5rem;
+  font-weight: 1;
   margin: 0;
   letter-spacing: 1px;
 }
 
 .descripcio-pelicula {
   color: #aaa;
-  font-size: 0.85rem;
+  font-size: 1.2rem;
   margin: 0;
   flex-grow: 1;
   display: -webkit-box;
@@ -334,22 +350,22 @@ defineEmits(["seleccioPelicula"]);
   line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  font-family: "ContentForm";
 }
 
 .boto-comprar {
   background-color: transparent;
-  color: #ff00aa;
+  color: #00eeff;
   border: 2px solid #ff00aa;
   padding: 10px 24px;
   border-radius: 30px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+  font-family: "NormalFont";
+  font-size: 1.5rem;
+  letter-spacing: 1.9px;
   cursor: pointer;
   box-shadow:
     0 0 10px #ff00aa,
     inset 0 0 10px #ff00aa;
-  text-shadow: 0 0 5px #ff00aa;
   transition: all 0.3s ease;
   align-self: flex-start;
   margin-top: auto;
@@ -358,9 +374,6 @@ defineEmits(["seleccioPelicula"]);
 .boto-comprar:hover {
   background-color: #ff00aa;
   color: #fff;
-  box-shadow:
-    0 0 20px #ff00aa,
-    inset 0 0 15px #ff00aa;
   text-shadow: none;
 }
 </style>

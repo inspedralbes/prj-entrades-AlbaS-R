@@ -1,26 +1,8 @@
 <template>
   <div>
     <div class="admin-panel">
-      <h2>Zona Control d'Escenari</h2>
-      <p>Benvingut, administrador loguejat i autoritzat de dades de StarMovie.</p>
-      
-      <div class="panells-grid">
-         <div class="card-admin">
-             <h3>Pelicules en Màster</h3>
-             <p>Revisa les publicacions pendents i actives</p>
-             <button class="btn-dark">Accedeix al CRUD</button>
-         </div>
-         <div class="card-admin">
-             <h3>Monitoratge Sales</h3>
-             <p>Estat dels seients presencials en les franges horàries.</p>
-             <button class="btn-dark">Modifica Aforament</button>
-         </div>
-         <div class="card-admin" style="border-top: 4px solid #28a745;">
-             <h3>Flux Financer</h3>
-             <p>Entrades emeses globalment i facturació bruta.</p>
-             <button class="btn-dark">Revisa Pagaments</button>
-         </div>
-      </div>
+      <h2>Zona de Administración</h2>
+
     </div>
   </div>
 </template>
@@ -31,15 +13,15 @@
 
 <style scoped>
 .admin-panel {
-  background: #fff; 
-  border-left: 6px solid #111; 
-  padding: 30px; 
+  background: #fff;
+  border-left: 6px solid #111;
+  padding: 30px;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .admin-panel h2 {
-  margin-top: 0; 
+  margin-top: 0;
   color: #111;
   font-size: 1.8rem;
 }

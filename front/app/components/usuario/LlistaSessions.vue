@@ -1,7 +1,7 @@
 <template>
   <div class="contenidor-principal">
     <button @click="$emit('tornar')" class="btn-back">⬅ TORNAR A LA CARTELLERA</button>
-    
+
     <div class="contenidor-titol">
       <div class="grup-neons-wrapper esquerra">
         <div class="grup-neons-esq">
@@ -24,15 +24,18 @@
 
     <div class="tauler">
       <h3 class="titol-pelicula-activa">HORARIS PER A: {{ peliculaActiva?.titol }}</h3>
-      
-      <p v-if="cinemaStore.sessions.length === 0" class="missatge-buit">Sense resultats d'horaris per a aquesta selecció.</p>
-      
+
+      <p v-if="cinemaStore.sessions.length === 0" class="missatge-buit">Sense resultats d'horaris per a aquesta
+        selecció.</p>
+
       <ul class="sessions-llista">
         <li v-for="sessio in cinemaStore.sessions" :key="sessio.id" class="sessio-card">
           <div class="sessio-detalls">
-              <p class="dades-sessio"><span class="etiqueta">HORARI:</span> {{ sessio.data_hora }} </p>
-              <p class="dades-sessio"><span class="etiqueta">SALA:</span> <span class="badge-sala">{{ sessio.sala.nom }} ({{ sessio.sala.nom === 'Sala VIP' ? 'Luxury' : 'Bàsic' }})</span></p>
-              <p class="dades-sessio"><span class="etiqueta">TARIFA:</span> <span class="preu">{{ sessio.preu }} €</span></p>
+            <p class="dades-sessio"><span class="etiqueta">HORARI:</span> {{ sessio.data_hora }} </p>
+            <p class="dades-sessio"><span class="etiqueta">SALA:</span> <span class="badge-sala">{{ sessio.sala.nom }}
+                ({{ sessio.sala.nom === 'Sala VIP' ? 'Luxury' : 'Bàsic' }})</span></p>
+            <p class="dades-sessio"><span class="etiqueta">TARIFA:</span> <span class="preu">{{ sessio.preu }} €</span>
+            </p>
           </div>
           <button class="btn-seleccionar-seients" @click="$emit('seleccioSessio', sessio.id)">TRIA LA LOCALITAT</button>
         </li>
@@ -120,13 +123,19 @@ defineEmits(['tornar', 'seleccioSessio']);
   height: 0;
 }
 
-.grup-neons-esq, .grup-neons-dreta {
+.grup-neons-esq,
+.grup-neons-dreta {
   position: absolute;
   z-index: -1;
 }
 
-.grup-neons-esq { right: -10px; }
-.grup-neons-dreta { left: -10px; }
+.grup-neons-esq {
+  right: -10px;
+}
+
+.grup-neons-dreta {
+  left: -10px;
+}
 
 .tub-curb {
   position: absolute;
@@ -143,10 +152,30 @@ defineEmits(['tornar', 'seleccioSessio']);
   border-left: 4px solid;
   border-right: none;
 }
-.grup-neons-esq .tub-1 { width: 180px; top: -30px; border-radius: 40px 0 0 0; }
-.grup-neons-esq .tub-2 { width: 170px; top: -20px; border-radius: 30px 0 0 0; }
-.grup-neons-esq .tub-3 { width: 160px; top: -10px; border-radius: 20px 0 0 0; }
-.grup-neons-esq .tub-4 { width: 150px; top: 0px; border-radius: 10px 0 0 0; }
+
+.grup-neons-esq .tub-1 {
+  width: 180px;
+  top: -30px;
+  border-radius: 40px 0 0 0;
+}
+
+.grup-neons-esq .tub-2 {
+  width: 170px;
+  top: -20px;
+  border-radius: 30px 0 0 0;
+}
+
+.grup-neons-esq .tub-3 {
+  width: 160px;
+  top: -10px;
+  border-radius: 20px 0 0 0;
+}
+
+.grup-neons-esq .tub-4 {
+  width: 150px;
+  top: 0px;
+  border-radius: 10px 0 0 0;
+}
 
 /* DRETA */
 .grup-neons-dreta .tub-curb {
@@ -154,18 +183,53 @@ defineEmits(['tornar', 'seleccioSessio']);
   border-right: 4px solid;
   border-left: none;
 }
-.grup-neons-dreta .tub-1 { width: 180px; top: -30px; border-radius: 0 40px 0 0; }
-.grup-neons-dreta .tub-2 { width: 170px; top: -20px; border-radius: 0 30px 0 0; }
-.grup-neons-dreta .tub-3 { width: 160px; top: -10px; border-radius: 0 20px 0 0; }
-.grup-neons-dreta .tub-4 { width: 150px; top: 0px; border-radius: 0 10px 0 0; }
 
-.tub-curb.rosa { border-color: #ff66cc; filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ff00aa) drop-shadow(0 0 20px #ff00aa); }
-.tub-curb.blau { border-color: #66ffff; filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00f3ff) drop-shadow(0 0 20px #00f3ff); }
-.tub-curb.groc { border-color: #ffff66; filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ffea00) drop-shadow(0 0 20px #ffea00); }
-.tub-curb.verd { border-color: #66ff66; filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00ff00) drop-shadow(0 0 20px #00ff00); }
+.grup-neons-dreta .tub-1 {
+  width: 180px;
+  top: -30px;
+  border-radius: 0 40px 0 0;
+}
+
+.grup-neons-dreta .tub-2 {
+  width: 170px;
+  top: -20px;
+  border-radius: 0 30px 0 0;
+}
+
+.grup-neons-dreta .tub-3 {
+  width: 160px;
+  top: -10px;
+  border-radius: 0 20px 0 0;
+}
+
+.grup-neons-dreta .tub-4 {
+  width: 150px;
+  top: 0px;
+  border-radius: 0 10px 0 0;
+}
+
+.tub-curb.rosa {
+  border-color: #ff66cc;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ff00aa) drop-shadow(0 0 20px #ff00aa);
+}
+
+.tub-curb.blau {
+  border-color: #66ffff;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00f3ff) drop-shadow(0 0 20px #00f3ff);
+}
+
+.tub-curb.groc {
+  border-color: #ffff66;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #ffea00) drop-shadow(0 0 20px #ffea00);
+}
+
+.tub-curb.verd {
+  border-color: #66ff66;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px #00ff00) drop-shadow(0 0 20px #00ff00);
+}
 
 .tauler {
-  background: #08080c;
+  background: #1d1c1a;
   border: 15px groove;
   border-image: url("/imgclient/textura2.jpg") 30 stretch;
   box-shadow: inset 0 8px 20px rgba(0, 0, 0, 0.8), 0 15px 30px rgba(0, 0, 0, 0.5);
@@ -178,7 +242,10 @@ defineEmits(['tornar', 'seleccioSessio']);
 .tauler::before {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
   pointer-events: none;
 }

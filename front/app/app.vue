@@ -2,14 +2,16 @@
   <div>
     <!-- Navegació principal -->
     <div class="capcalera-nav">
-      <img id="banner" src="/imgclient/banner.png" alt="StarMovie">
-
+      <div class="banner-wrapper">
+        <img id="banner" src="/imgclient/banner.png" alt="StarMovie">
+      </div>
       <nav class="menu-tiquets">
         <NuxtLink to="/usuario" class="tiquet magenta">Cartellera General</NuxtLink>
         <NuxtLink v-if="authStore.usuariActual" to="/usuario/entrades" class="tiquet cian">Les meves reserves</NuxtLink>
         <NuxtLink v-if="authStore.usuariActual?.is_admin" to="/admin" class="tiquet groc">Gestió Admin</NuxtLink>
 
-        <button v-if="!authStore.usuariActual" class="tiquet verd" @click="authStore.mostrarModal = true">Inicia sessió</button>
+        <button v-if="!authStore.usuariActual" class="tiquet verd" @click="authStore.mostrarModal = true">Inicia
+          sessió</button>
         <div v-else class="tiquet verd tiquet-usuari">
           <span>{{ authStore.usuariActual.name }}</span>
           <button class="btn-tiquet-interior" @click="authStore.ferLogout()">[SORTIR]</button>
@@ -59,11 +61,78 @@ button {
 }
 
 #banner {
-  margin-top: -60px;
+  width: 100%;
+  display: block;
+}
+
+.banner-wrapper {
+  position: relative;
   max-width: 900px;
   width: 100%;
-  filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.4));
 }
+
+/* Llum esquerra — blau */
+.banner-wrapper::before {
+  top: 16%;
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 13%;
+  width: 60%;
+  height: 61%;
+  background: rgba(0, 243, 255, 0.6);
+  filter: blur(20px);
+  border-radius: 50%;
+  animation: llum-blau 3s ease-in-out infinite;
+  z-index: -1;
+}
+
+/* Llum dreta — rosa */
+.banner-wrapper::after {
+  top: 16%;
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  right: 13%;
+  width: 60%;
+  height: 61%;
+  background: rgba(255, 0, 170, 0.6);
+  filter: blur(20px);
+  border-radius: 50%;
+  animation: llum-rosa 3s ease-in-out infinite;
+  z-index: -1;
+}
+
+/* Animació parpadeig */
+@keyframes llum-blau {
+  0% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes llum-rosa {
+  0% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.2;
+  }
+}
+
+
 
 .menu-tiquets {
   display: flex;
