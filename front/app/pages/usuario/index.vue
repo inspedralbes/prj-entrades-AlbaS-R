@@ -11,8 +11,8 @@
               @seleccioPelicula="seleccionarPelicula" 
             />
             
-            <UsuarioLlistaSessions 
-              v-else-if="vistaActual === 'sessions'" 
+            <UsuarioSeleccioSessio
+              v-else-if="vistaActual === 'sessions'"
               :peliculaActiva="peliculaActiva"
               @tornar="vistaActual = 'cartellera'"
               @seleccioSessio="seleccionarSessio"
