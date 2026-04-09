@@ -124,23 +124,54 @@ const seleccionarTipus = (tipus) => {
   pasActual.value = 2;
 };
 
-// Filtres de sessions amb comprovació de seguretat
+// Separem les sessions normals per ensenyar-les primer
 const sessionsNormals = computed(() => {
-  if (!cinemaStore.sessions) return [];
-  return cinemaStore.sessions.filter(s => s.sala && !s.sala.nom.toUpperCase().includes('VIP'));
+  const totes = cinemaStore.sessions;
+  if (!totes) return [];
+  
+  const resultat = [];
+  for (let i = 0; i < totes.length; i++) {
+    const s = totes[i];
+    // Mirem si la sala no és de les VIP
+    if (s.sala && s.sala.nom.toUpperCase().indexOf('VIP') === -1) {
+      resultat.push(s);
+    }
+  }
+  return resultat;
 });
 
+// Aquí només deixem les sessions que es fan a sales VIP
 const sessionsVip = computed(() => {
-  if (!cinemaStore.sessions) return [];
-  return cinemaStore.sessions.filter(s => s.sala && s.sala.nom.toUpperCase().includes('VIP'));
+  const totes = cinemaStore.sessions;
+  if (!totes) return [];
+  
+  const resultat = [];
+  for (let i = 0; i < totes.length; i++) {
+    const s = totes[i];
+    // Busquem la paraula VIP al nom de la sala
+    if (s.sala && s.sala.nom.toUpperCase().indexOf('VIP') !== -1) {
+      resultat.push(s);
+    }
+  }
+  return resultat;
 });
 
+// Posa les estrelles segons la nota que té la peli
 const calcularEstrelles = (ratingStr) => {
   if (!ratingStr) return "⭐⭐";
   let valor = parseFloat(ratingStr);
-  if (ratingStr.includes('%')) valor = valor / 10;
+  if (ratingStr && ratingStr.indexOf('%') !== -1) {
+    valor = valor / 10;
+  }
   const numEstrelles = Math.round(valor / 2);
-  return "⭐".repeat(Math.max(1, Math.min(5, numEstrelles)));
+  
+  let estrelles = "";
+  for (let i = 0; i < 5; i++) {
+    if (i < numEstrelles) {
+      estrelles += "⭐";
+    }
+  }
+  return estrelles || "⭐";
 };
 </script>
 

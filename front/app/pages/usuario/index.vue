@@ -38,13 +38,14 @@ const authStore = useAuthStore();
 
 const vistaActual = ref('cartellera'); 
 const peliculaActiva = ref(null);
-const reservaDeButacaTemporal = ref(null);
+const reservaDeButacaTemporal = ref([]);
 
-onMounted(function() {
-  cinemaStore.fetchPelicules();
+// Ens baixem les pelis només començar
+onMounted(() => {
+  cinemaStore.carregarPelicules();
 });
 
-// Control de visibilitat de la capçalera (Banner + Nav) per estalviar scroll
+// Vigilem on som per amagar o ensenyar la capçalera i no haver de fer tant scroll
 watch(vistaActual, (novaVista) => {
   if (novaVista === 'cartellera') {
     cinemaStore.mostrarCapcalera = true;
@@ -53,55 +54,64 @@ watch(vistaActual, (novaVista) => {
   }
 }, { immediate: true });
 
-// Resolució del pendent de compra si s'acaba de detectar accés procedent del modal
+// Si l'usuari s'identifica i tenia una compra a mitges, la reprenem
 watch(() => authStore.usuariActual, function(nouUsuari) {
-   if (nouUsuari && reservaDeButacaTemporal.value) {
+   if (nouUsuari && reservaDeButacaTemporal.value.length > 0) {
        compraRealitzada();
    }
 });
 
+// Quan cliques una peli, busquem les seves hores i canviem de vista
 async function seleccionarPelicula(pelicula) {
   peliculaActiva.value = pelicula;
-  await cinemaStore.fetchSessions(pelicula.id);
+  await cinemaStore.carregarSessions(pelicula.id);
   vistaActual.value = 'sessions';
 }
 
+// Un cop triada la sessió, mirem quins seients queden lliures
 async function seleccionarSessio(sessioId) {
-  await cinemaStore.fetchSeients(sessioId);
+  await cinemaStore.carregarSeients(sessioId);
   vistaActual.value = 'seients';
 }
 
-function iniciarPasarela(seient) {
-  reservaDeButacaTemporal.value = seient;
+// Guardem els seients un moment per si cal fer login abans de pagar
+function iniciarPasarela(seients) {
+  reservaDeButacaTemporal.value = seients;
   compraRealitzada();
 }
 
+// Aquí és on fem la màgia de la reserva
 async function compraRealitzada() {
-    if (!reservaDeButacaTemporal.value) {
+    if (reservaDeButacaTemporal.value.length === 0) {
         return;
     }
 
+    // Si no ha entrat al compte, li ensenyem el formulari
     if (!authStore.usuariActual) {
-        // Activació del component global AuthModal
         authStore.mostrarModal = true;
         return;
     }
 
     try {
-        await api.comprarEntrada({
-            usuari_id: authStore.usuariActual.id,
-            sessio_id: cinemaStore.sessioActiva.id,
-            seient_id: reservaDeButacaTemporal.value.id
-        });
+        // Anem reservant cada butaca una per una (bucle de tota la vida)
+        const llistaDeButaques = reservaDeButacaTemporal.value;
+        for (let i = 0; i < llistaDeButaques.length; i++) {
+            const seient = llistaDeButaques[i];
+            await api.comprarEntrada({
+                usuari_id: authStore.usuariActual.id,
+                sessio_id: cinemaStore.sessioActiva.id,
+                seient_id: seient.id
+            });
+        }
 
-        alert("Transacció d'entrada operada sota èxit.");
+        alert("Perfecte! Ja tens les teves entrades reservades.");
         
-        await cinemaStore.fetchSeients(cinemaStore.sessioActiva.id);
-        reservaDeButacaTemporal.value = null;
+        // Refresquem el mapa per no triar seients que s'acaben de vendre
+        await cinemaStore.carregarSeients(cinemaStore.sessioActiva.id);
+        reservaDeButacaTemporal.value = [];
         
     } catch(err) {
-        alert("Operació cancel·lada durant l'accés a l'esquema de dades: " + err.message);
-        reservaDeButacaTemporal.value = null;
+        alert("Ostres! Hi ha hagut un error amb la reserva: " + err.message);
     }
 }
 </script>

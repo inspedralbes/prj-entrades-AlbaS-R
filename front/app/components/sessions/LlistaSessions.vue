@@ -48,6 +48,7 @@ defineEmits(['update:modelValue']);
 function formatarData(dataHora) {
   if (!dataHora) return "Data pendent";
   try {
+    // Posem la T per si a la base de dades ve amb espais (format ISO)
     const strData = dataHora.includes('T') ? dataHora : dataHora.replace(' ', 'T');
     const data = new Date(strData);
     if (isNaN(data.getTime())) return dataHora;
@@ -55,6 +56,7 @@ function formatarData(dataHora) {
     const dia = data.getDate();
     const mes = data.toLocaleString('ca-ES', { month: 'long' });
     const hora = dataHora.slice(11, 16);
+    // Ho deixem bonic perquè s'entengui bé
     return `${dia} de ${mes} · ${hora}`;
   } catch (e) {
     return dataHora;

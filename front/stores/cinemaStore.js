@@ -13,40 +13,40 @@ export const useCinemaStore = defineStore('cinema', {
     };
   },
   actions: {
-    // Obtenir la globalitat de pel·lícules des de l'API
-    async fetchPelicules() {
+    // Portem totes les pelis que tenim a la base de dades
+    async carregarPelicules() {
       this.carregant = true;
       try {
-        const dades = await api.getPelicules();
+        const dades = await api.obtenirPelicules();
         this.pelicules = dades;
       } catch (error) {
-        console.error("L'API ha refusat aquesta connexió.", error);
+        console.error("No s'ha pogut connectar amb l'API per treure les pelis.", error);
       } finally {
         this.carregant = false;
       }
     },
 
-    // Obtenir sessions filtrant per model id pelicula
-    async fetchSessions(peliculaId) {
+    // Busquem les sessions d'una peli fent servir el seu ID
+    async carregarSessions(peliculaId) {
       this.carregant = true;
       try {
-        this.sessions = await api.getSessionsByPelicula(peliculaId);
+        this.sessions = await api.obtenirSessionsPerPelicula(peliculaId);
       } catch (error) {
-        console.error("Incapacitat per recuperar el calendari de sessions.", error);
+        console.error("Error al carregar les hores de les sessions.", error);
       } finally {
         this.carregant = false;
       }
     },
 
-    // Obtenir la informació de sala i estat dels seients
-    async fetchSeients(sessioId) {
+    // Agafem tota la info de la sala i mirem quines butaques estan ocupades
+    async carregarSeients(sessioId) {
       this.carregant = true;
       try {
-        const dades = await api.getSessio(sessioId);
+        const dades = await api.obtenirSessio(sessioId);
         this.sessioActiva = dades.sessio;
         this.seients = dades.seients_mapa;
       } catch (error) {
-        console.error("Càrrega de sala virtual avortada", error);
+        console.error("S'ha tallat la càrrega del mapa de la sala.", error);
       } finally {
         this.carregant = false;
       }

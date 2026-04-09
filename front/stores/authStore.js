@@ -4,33 +4,33 @@ import { api } from '../services/api';
 export const useAuthStore = defineStore('auth', {
   state: function() {
     return {
-      // Emmagatzema tota la informació de compte d'usuari
+      // Dades de l'usuari que ha entrat i si hem d'ensenyar el modal
       usuariActual: null,
       mostrarModal: false
     };
   },
   actions: {
-    // Iniciar sessió
+    // Intentem validar l'usuari amb el seu correu i contrasenya
     async ferLogin(credencials) {
-      const resp = await api.login(credencials);
-      if (resp.user) {
-        this.usuariActual = resp.user;
+      const resposta = await api.iniciarSessio(credencials);
+      if (resposta.user) {
+        this.usuariActual = resposta.user;
         return true; 
       }
       return false; 
     },
     
-    // Inserció del referent membre
+    // Creem un usuari nou i l'enviem a la base de dades
     async ferRegistre(dades) {
-      const resp = await api.register(dades);
-      if (resp.user) {
-        this.usuariActual = resp.user;
+      const resposta = await api.registrarUsuari(dades);
+      if (resposta.user) {
+        this.usuariActual = resposta.user;
         return true; 
       }
       return false;
     },
     
-    // Tancar accés global de la memòria Pinia
+    // Netegem la sessió i tornem a estat anònim
     ferLogout() {
       this.usuariActual = null;
     }
