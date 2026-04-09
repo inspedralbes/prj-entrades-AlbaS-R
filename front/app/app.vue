@@ -1,20 +1,37 @@
 <template>
   <div>
     <!-- Navegació principal -->
-    <div class="capcalera-nav">
+    <!-- Navegació principal - S'amaga durant el procés de compra per evitar scroll innecesari -->
+    <div v-if="cinemaStore.mostrarCapcalera" class="capcalera-nav">
       <div class="banner-wrapper">
-        <img id="banner" src="/imgclient/banner.png" alt="StarMovie">
+        <NuxtLink to="/usuario">
+          <img id="banner" src="/imgclient/banner.png" alt="StarMovie">
+        </NuxtLink>
       </div>
       <nav class="menu-tiquets">
-        <NuxtLink to="/usuario" class="tiquet magenta">Cartellera General</NuxtLink>
-        <NuxtLink v-if="authStore.usuariActual" to="/usuario/entrades" class="tiquet cian">Les meves reserves</NuxtLink>
-        <NuxtLink v-if="authStore.usuariActual?.is_admin" to="/admin" class="tiquet groc">Gestió Admin</NuxtLink>
+        <!-- BOTÓ INICI / DROPDOWN USUARI -->
+        <button v-if="!authStore.usuariActual" class="tiquet verd" @click="authStore.mostrarModal = true">
+          Inicia sessió
+        </button>
 
-        <button v-if="!authStore.usuariActual" class="tiquet verd" @click="authStore.mostrarModal = true">Inicia
-          sessió</button>
-        <div v-else class="tiquet verd tiquet-usuari">
-          <span>{{ authStore.usuariActual.name }}</span>
-          <button class="btn-tiquet-interior" @click="authStore.ferLogout()">[SORTIR]</button>
+        <div v-else class="dropdown-usuari">
+          <button class="tiquet verd" @click="menuObert = !menuObert">
+            {{ authStore.usuariActual.name }} <span class="flecha">▼</span>
+          </button>
+
+          <div v-if="menuObert" class="menu-desplegable">
+            <NuxtLink to="/usuario/entrades" class="opcio-menu" @click="menuObert = false">
+               LES MEVES RESERVES
+            </NuxtLink>
+            <NuxtLink v-if="authStore.usuariActual?.is_admin" to="/admin" class="opcio-menu groc-text"
+              @click="menuObert = false">
+               GESTIÓ ADMIN
+            </NuxtLink>
+            <div class="separador"></div>
+            <button class="opcio-menu sortir" @click="handleLogout">
+               SORTIR
+            </button>
+          </div>
         </div>
       </nav>
     </div>
@@ -29,8 +46,34 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useAuthStore } from '../stores/authStore';
+import { useCinemaStore } from '../stores/cinemaStore';
+
 const authStore = useAuthStore();
+const cinemaStore = useCinemaStore();
+
+const menuObert = ref(false);
+
+const handleLogout = () => {
+  menuObert.value = false;
+  authStore.ferLogout();
+}
+
+// Tancar menú en clicar fora
+const tancarSiClicaFora = (e) => {
+  if (!e.target.closest('.dropdown-usuari')) {
+    menuObert.value = false;
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('click', tancarSiClicaFora);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('click', tancarSiClicaFora);
+});
 </script>
 
 <style>
@@ -54,10 +97,10 @@ button {
 
 <style scoped>
 .capcalera-nav {
-  padding: 40px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
 #banner {
@@ -135,12 +178,12 @@ button {
 
 
 .menu-tiquets {
+  position: absolute;
+  top: 40px;
+  right: 40px;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   gap: 20px;
-  width: 100%;
-  max-width: 1000px;
+  z-index: 100;
 }
 
 .tiquet {
@@ -165,32 +208,105 @@ button {
   white-space: nowrap;
 }
 
-.tiquet:hover,
-.tiquet.router-link-active {
+.tiquet:hover {
   transform: scale(1.05);
   background-color: #1a1a24;
 }
 
-.tiquet-usuari {
-  display: flex;
-  gap: 15px;
+.tiquet.verd {
+  border-color: #00ff00;
+  color: #00ff00;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
 }
 
-.btn-tiquet-interior {
+/* --- DESPLEGABLE USUARI --- */
+.dropdown-usuari {
+  position: relative;
+}
+
+.flecha {
+  font-size: 0.8rem;
+  margin-left: 8px;
+  transition: transform 0.3s;
+  display: inline-block;
+}
+
+.menu-desplegable {
+  position: absolute;
+  top: calc(100% + 15px);
+  right: 0;
+  width: 280px;
+  background: rgba(11, 11, 20, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid #00f3ff;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.8),
+    0 0 15px rgba(0, 243, 255, 0.3);
+  padding: 10px 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Punxa del menú */
+.menu-desplegable::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 30px;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #00f3ff;
+}
+
+.opcio-menu {
+  padding: 15px 25px;
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
   background: transparent;
   border: none;
-  color: inherit;
-  font-family: inherit;
-  font-weight: bold;
+  text-align: left;
   cursor: pointer;
-  text-shadow: inherit;
-  font-size: 1rem;
-  padding: 0;
-  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.btn-tiquet-interior:hover {
-  color: #fff;
+.opcio-menu:hover {
+  background: rgba(0, 243, 255, 0.1);
+  color: #00f3ff;
+  padding-left: 30px;
+}
+
+.opcio-menu.groc-text {
+  color: #ffea00;
+}
+
+.opcio-menu.groc-text:hover {
+  background: rgba(255, 234, 0, 0.1);
+  color: #ffea00;
+}
+
+.separador {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 5px 0;
+}
+
+.opcio-menu.sortir {
+  color: #ff4d4d;
+}
+
+.opcio-menu.sortir:hover {
+  background: rgba(255, 77, 77, 0.1);
+  color: #ff4d4d;
 }
 
 .contenidor-app {

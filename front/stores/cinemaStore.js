@@ -9,6 +9,7 @@ export const useCinemaStore = defineStore('cinema', {
       sessioActiva: null,
       seients: [],
       carregant: false,
+      mostrarCapcalera: true,
     };
   },
   actions: {

@@ -44,6 +44,15 @@ onMounted(function() {
   cinemaStore.fetchPelicules();
 });
 
+// Control de visibilitat de la capçalera (Banner + Nav) per estalviar scroll
+watch(vistaActual, (novaVista) => {
+  if (novaVista === 'cartellera') {
+    cinemaStore.mostrarCapcalera = true;
+  } else {
+    cinemaStore.mostrarCapcalera = false;
+  }
+}, { immediate: true });
+
 // Resolució del pendent de compra si s'acaba de detectar accés procedent del modal
 watch(() => authStore.usuariActual, function(nouUsuari) {
    if (nouUsuari && reservaDeButacaTemporal.value) {

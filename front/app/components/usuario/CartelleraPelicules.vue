@@ -311,13 +311,6 @@ defineEmits(["seleccioPelicula"]);
   font-family: "MovingFont";
 }
 
-.etiqueta-pantalla {
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: bold;
-  letter-spacing: 20px;
-}
-
 .titol-pelicula {
   color: #00f2ff00;
   text-shadow:
