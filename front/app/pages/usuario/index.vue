@@ -23,6 +23,14 @@
               @tornar="vistaActual = 'sessions'"
               @comprar="iniciarPasarela"
             />
+
+            <UsuarioPagament
+              v-else-if="vistaActual === 'pagament'"
+              :peliculaActiva="peliculaActiva"
+              :seientsSeleccionats="reservaDeButacaTemporal"
+              @tornar="vistaActual = 'seients'"
+              @pagat="compraRealitzada"
+            />
         </div>
     </div>
 </template>
@@ -32,6 +40,7 @@ import { onMounted, ref, watch } from 'vue';
 import { useCinemaStore } from '../../../stores/cinemaStore';
 import { useAuthStore } from '../../../stores/authStore';
 import { api } from '../../../services/api';
+import UsuarioPagament from '../../components/usuario/Pagament.vue';
 
 const cinemaStore = useCinemaStore();
 const authStore = useAuthStore();
@@ -74,26 +83,26 @@ async function seleccionarSessio(sessioId) {
   vistaActual.value = 'seients';
 }
 
-// Guardem els seients un moment per si cal fer login abans de pagar
+// Guardem els seients un moment i anem a la pantalla de pagament
 function iniciarPasarela(seients) {
   reservaDeButacaTemporal.value = seients;
-  compraRealitzada();
+  vistaActual.value = 'pagament';
 }
 
-// Aquí és on fem la màgia de la reserva
+// Aquí és on fem la màgia de la reserva definitiva
 async function compraRealitzada() {
     if (reservaDeButacaTemporal.value.length === 0) {
         return;
     }
 
-    // Si no ha entrat al compte, li ensenyem el formulari
+    // Si no ha entrat al compte, li ensenyem el formulari primer
     if (!authStore.usuariActual) {
         authStore.mostrarModal = true;
         return;
     }
 
     try {
-        // Anem reservant cada butaca una per una (bucle de tota la vida)
+        // Anem reservant cada butaca una per una (bucle clàssic)
         const llistaDeButaques = reservaDeButacaTemporal.value;
         for (let i = 0; i < llistaDeButaques.length; i++) {
             const seient = llistaDeButaques[i];
@@ -106,9 +115,10 @@ async function compraRealitzada() {
 
         alert("Perfecte! Ja tens les teves entrades reservades.");
         
-        // Refresquem el mapa per no triar seients que s'acaben de vendre
+        // Refresquem el mapa i tornem a l'inici
         await cinemaStore.carregarSeients(cinemaStore.sessioActiva.id);
         reservaDeButacaTemporal.value = [];
+        vistaActual.value = 'cartellera';
         
     } catch(err) {
         alert("Ostres! Hi ha hagut un error amb la reserva: " + err.message);

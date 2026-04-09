@@ -45,11 +45,11 @@ onMounted(async function() {
     }
     
     try {
-        const dades = await api.getLesMevesEntrades(authStore.usuariActual.id);
+        const dades = await api.obtenirLesMevesEntrades(authStore.usuariActual.id);
         entrades.value = dades;
     } catch (e) {
-        console.error(e);
-        alert("Problemes llegint les entrades xifrades. Verifica la xarxa principal.");
+        console.error("Error al obtenir entrades:", e);
+        alert("Hi ha hagut un problema carregant el teu historial d'entrades. Torna-ho a provar.");
     } finally {
         carregant.value = false;
     }
