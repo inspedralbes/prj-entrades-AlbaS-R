@@ -1,6 +1,5 @@
 <template>
   <div class="contenidor-principal">
-    
     <!-- CAPÇALERA -->
     <div class="contenidor-titol">
       <h2 class="titol-seients">SEIENTS</h2>
@@ -9,9 +8,13 @@
     <!-- TAULER -->
     <div class="tauler">
       <div class="capcalera-seients">
-        <button class="boto-tornar" @click="$emit('tornar')">← Canviar horari</button>
+        <button class="boto-tornar" @click="$emit('tornar')">
+          ← Canviar horari
+        </button>
         <div class="info-sala">
-          <span class="nom-sala">{{ cinemaStore.sessioActiva?.sala?.nom }}</span>
+          <span class="nom-sala">{{
+            cinemaStore.sessioActiva?.sala?.nom
+          }}</span>
           <span class="desc-sala">Capacitat: {{ seientsTotals }} butaques</span>
         </div>
       </div>
@@ -26,16 +29,21 @@
 
         <!-- QUADRÍCULA -->
         <div class="quadricula-seients">
-          <div v-for="(fila, indexFila) in seientsPerFila" :key="indexFila" class="fila-seients">
+          <div
+            v-for="(fila, indexFila) in seientsPerFila"
+            :key="indexFila"
+            class="fila-seients"
+          >
             <div class="etiqueta-fila">{{ indexFila }}</div>
             <div class="butaques-fila">
-              <div 
-                v-for="seient in fila" 
-                :key="seient.id" 
+              <div
+                v-for="seient in fila"
+                :key="seient.id"
                 class="butaca-box"
-                :class="{ 
-                  'ocupat': seient.ocupat, 
-                  'seleccionat': esSeientSeleccionat(seient.id)
+                :class="{
+                  ocupat: seient.ocupat,
+                  seleccionat: esSeientSeleccionat(seient.id),
+                  'bloquejat-altre': esSeientBloquejat(seient.id),
                 }"
                 @click="toggleSeient(seient)"
               >
@@ -48,19 +56,35 @@
 
         <!-- LLEGENDA -->
         <div class="llegenda-seients">
-          <div class="item-llegenda"><div class="butaca-box mini"></div> <span>Lliure</span></div>
-          <div class="item-llegenda"><div class="butaca-box mini ocupat"></div> <span>Ocupat</span></div>
-          <div class="item-llegenda"><div class="butaca-box mini seleccionat"></div> <span>El teu lloc</span></div>
+          <div class="item-llegenda">
+            <div class="butaca-box mini"></div>
+            <span>Lliure</span>
+          </div>
+          <div class="item-llegenda">
+            <div class="butaca-box mini ocupat"></div>
+            <span>Ocupat</span>
+          </div>
+          <div class="item-llegenda">
+            <div class="butaca-box mini seleccionat"></div>
+            <span>El teu lloc</span>
+          </div>
         </div>
       </div>
 
       <!-- BARRA DE COMPRA (CHECKOUT) -->
-      <div class="checkout-bar" :class="{ 'visible': seientsSeleccionats.length > 0 }">
+      <div
+        class="checkout-bar"
+        :class="{ visible: seientsSeleccionats.length > 0 }"
+      >
         <div class="detalls-compra">
           <div class="info-tiquets">
             <span class="titol-checkout">Entrades triades:</span>
             <div class="tags-seients">
-              <span v-for="s in seientsSeleccionats" :key="s.id" class="tag-seient">
+              <span
+                v-for="s in seientsSeleccionats"
+                :key="s.id"
+                class="tag-seient"
+              >
                 F{{ s.fila_seient }}-S{{ s.nombre_seient }}
               </span>
             </div>
@@ -74,27 +98,83 @@
           RESERVAR {{ seientsSeleccionats.length }} ENTRADES
         </button>
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useCinemaStore } from '../../../stores/cinemaStore';
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useCinemaStore } from "../../../stores/cinemaStore";
+import { socketService } from "../../../services/socket";
 
 const cinemaStore = useCinemaStore();
 const seientsSeleccionats = ref([]);
+const seientsBloquejats = ref([]);
 
-const emit = defineEmits(['tornar', 'comprar']);
+onMounted(() => {
+  socketService.entrarASessio(cinemaStore.sessioActiva.id);
+
+  // Cuando alguien selecciona un asiento
+  socketService.socket.on("seient_ocupat", (data) => {
+    seientsBloquejats.value.push(data.seient_id);
+  });
+
+  // Cuando alguien desmarca su asiento
+  socketService.socket.on("seient_desocupat", (data) => {
+    let novaLlista = [];
+    const bloquejats = seientsBloquejats.value;
+
+    // Filtramos usando un FOR
+    for (let i = 0; i < bloquejats.length; i++) {
+      if (bloquejats[i] !== data.seient_id) {
+        novaLlista.push(bloquejats[i]);
+      }
+    }
+    seientsBloquejats.value = novaLlista;
+  });
+
+  // Cuando otra persona sí finaliza la compra
+  socketService.socket.on("compra_finalitzada", (data) => {
+    const seientsComprats = data.seient_ids;
+
+    for (let i = 0; i < seientsComprats.length; i++) {
+      let id_comprat = seientsComprats[i];
+
+      // 1. Lo marcamos permanentemente como ocupado buscando con un FOR
+      for (let j = 0; j < cinemaStore.seients.length; j++) {
+        if (cinemaStore.seients[j].id === id_comprat) {
+          cinemaStore.seients[j].ocupat = true;
+          break; // Hemos encontrado el asiento, dejamos de buscar
+        }
+      }
+
+      // 2. Lo quitamos de tu propia lista de bloqueados temporalmente con otro FOR
+      let novaLlistaBloquejats = [];
+      const bloquejatsAct = seientsBloquejats.value;
+      for (let k = 0; k < bloquejatsAct.length; k++) {
+        if (bloquejatsAct[k] !== id_comprat) {
+          novaLlistaBloquejats.push(bloquejatsAct[k]);
+        }
+      }
+      seientsBloquejats.value = novaLlistaBloquejats;
+    }
+  });
+});
+
+// Desconectamos el socket cuando el usuario tira para atrás
+onUnmounted(() => {
+  socketService.desconnectar();
+});
+
+const emit = defineEmits(["tornar", "comprar"]);
 
 // Ajuntem els seients per cada fila per poder-los dibuixar bé
 const seientsPerFila = computed(() => {
   if (!cinemaStore.seients) return {};
-  
+
   const grups = {};
   const llistaSeients = cinemaStore.seients;
-  
+
   // Anem omplint la graella fila per fila
   for (let i = 0; i < llistaSeients.length; i++) {
     const s = llistaSeients[i];
@@ -103,7 +183,7 @@ const seientsPerFila = computed(() => {
     }
     grups[s.fila_seient].push(s);
   }
-  
+
   // Ordenem que les butaques vagin en ordre dins de la fila
   const files = Object.keys(grups);
   for (let j = 0; j < files.length; j++) {
@@ -111,7 +191,7 @@ const seientsPerFila = computed(() => {
     const fila = grups[clau];
     fila.sort((a, b) => a.nombre_seient - b.nombre_seient);
   }
-  
+
   return grups;
 });
 
@@ -138,13 +218,27 @@ const esSeientSeleccionat = (seientId) => {
   return false;
 };
 
+const esSeientBloquejat = (seientId) => {
+  const bloquejats = seientsBloquejats.value;
+  for (let i = 0; i < bloquejats.length; i++) {
+    if (bloquejats[i] === seientId) {
+      return true;
+    }
+  }
+  return false;
+};
+
+// Clica una butaca per agafar-la o deixar-la anar
 // Clica una butaca per agafar-la o deixar-la anar
 const toggleSeient = (seient) => {
-  if (seient.ocupat) return;
-  
+  // Verificamos si esta ocupado o bloqueado por otra persona
+  if (seient.ocupat === true || esSeientBloquejat(seient.id) === true) {
+    return;
+  }
+
   const llistaSeleccionats = seientsSeleccionats.value;
   let index = -1;
-  
+
   // Busquem si ja la teníem a l'array per veure si l'hem de treure
   for (let i = 0; i < llistaSeleccionats.length; i++) {
     if (llistaSeleccionats[i].id === seient.id) {
@@ -156,16 +250,32 @@ const toggleSeient = (seient) => {
   if (index >= 0) {
     // Si ja hi era, la traiem de la llista
     seientsSeleccionats.value.splice(index, 1);
+
+    // AVISAMOS AL SOCKET DE QUE LO HEMOS SOLTADO
+    socketService.desmarcarSeient(cinemaStore.sessioActiva.id, seient.id);
   } else {
     // Si no, l'afegim a la compra
     seientsSeleccionats.value.push(seient);
+
+    // AVISAMOS AL SOCKET DE QUE LO HEMOS COGIDO
+    socketService.marcarSeient(cinemaStore.sessioActiva.id, seient.id);
   }
 };
 
 // Avisem al component pare que ja volem anar a pagar
 const confirmarReserva = () => {
   if (seientsSeleccionats.value.length > 0) {
-    emit('comprar', seientsSeleccionats.value);
+    // 1. Extraemos solo los IDs con un bucle clásico
+    let idsComprats = [];
+    for (let i = 0; i < seientsSeleccionats.value.length; i++) {
+      idsComprats.push(seientsSeleccionats.value[i].id);
+    }
+
+    // 2. Avisamos al servidor (WebSocket)
+    socketService.confirmarCompra(cinemaStore.sessioActiva.id, idsComprats);
+
+    // 3. Seguimos con el flujo normal de Vue
+    emit("comprar", seientsSeleccionats.value);
   }
 };
 
@@ -173,7 +283,7 @@ const confirmarReserva = () => {
 const calcularEstrelles = (ratingStr) => {
   if (!ratingStr) return "⭐⭐";
   let valor = parseFloat(ratingStr);
-  if (ratingStr && ratingStr.indexOf('%') !== -1) {
+  if (ratingStr && ratingStr.indexOf("%") !== -1) {
     valor = valor / 10;
   }
   const numEstrelles = Math.round(valor / 2);
@@ -210,7 +320,9 @@ const calcularEstrelles = (ratingStr) => {
   font-size: 6rem;
   letter-spacing: 4px;
   margin-bottom: 120px;
-  text-shadow: 0 0 15px #fff45f, 0 0 30px #ffeb79;
+  text-shadow:
+    0 0 15px #fff45f,
+    0 0 30px #ffeb79;
   text-align: center;
   text-transform: uppercase;
 }
@@ -219,7 +331,9 @@ const calcularEstrelles = (ratingStr) => {
   background: rgb(29, 28, 26);
   border: 15px groove;
   border-image: url("/imgclient/textura2.jpg") 30 stretch;
-  box-shadow: inset 0 8px 20px rgba(0,0,0,0.8), 0 20px 25px 10px rgb(0,0,0);
+  box-shadow:
+    inset 0 8px 20px rgba(0, 0, 0, 0.8),
+    0 20px 25px 10px rgb(0, 0, 0);
   padding: 40px;
   position: relative;
   z-index: 10;
@@ -360,6 +474,14 @@ const calcularEstrelles = (ratingStr) => {
   animation: pulse 1.5s infinite;
 }
 
+.butaca-box.bloquejat-altre {
+  border-color: #ff00aa;
+  background: rgba(255, 0, 170, 0.1);
+  box-shadow: 0 0 10px rgba(255, 0, 170, 0.3);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .num-butaca {
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.5);
@@ -409,7 +531,9 @@ const calcularEstrelles = (ratingStr) => {
   justify-content: space-between;
   align-items: center;
   margin-top: 40px;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(255, 234, 0, 0.2);
+  box-shadow:
+    0 -10px 40px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(255, 234, 0, 0.2);
   transform: translateY(150%);
   transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 100;
@@ -492,13 +616,25 @@ const calcularEstrelles = (ratingStr) => {
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 5px #ffea00; }
-  50% { box-shadow: 0 0 25px #ffea00; }
-  100% { box-shadow: 0 0 5px #ffea00; }
+  0% {
+    box-shadow: 0 0 5px #ffea00;
+  }
+  50% {
+    box-shadow: 0 0 25px #ffea00;
+  }
+  100% {
+    box-shadow: 0 0 5px #ffea00;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
