@@ -9,7 +9,7 @@
           <div class="tub-curb tub-4 verd"></div>
         </div>
       </div>
-      <h2 class="titol-cartellera">CARTELLER</h2>
+      <h2 class="titol-cartellera">CARTELLERA</h2>
       <div class="grup-neons-wrapper dreta">
         <div class="grup-neons-dreta">
           <div class="tub-curb tub-1 rosa"></div>
