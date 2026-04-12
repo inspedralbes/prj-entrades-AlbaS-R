@@ -60,6 +60,12 @@ io.on("connection", (socket) => {
     console.log(`Compra finalitzada per usuari ${sessio_id} por ${socket.id}`);
     io.to(`session_${sessio_id}`).emit("compra_finalitzada", { seient_ids });
   });
+
+  socket.on("notificar_canvi_pelicules", () => {
+    console.log("Un admin ha cambiado las películas. Avisando a todos...");
+    io.emit("pelicules_actualitzades");
+  });
+
   socket.on("disconnect", () => {
     const dadesUsuari = socketData.get(socket.id);
     if (dadesUsuari) {

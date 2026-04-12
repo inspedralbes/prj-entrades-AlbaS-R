@@ -90,6 +90,7 @@ const esborrar = async (id, titol) => {
         try {
             await api.esborrarPelicula(id);
             // Recarreguem la llista un cop esborrada per veure l'actualització de dades
+            socketService.notificarCanviPelicules();
             await carregarDades();
         } catch (error) {
             alert("S'ha produït un error a l'hora d'esborrar la pel·lícula.");

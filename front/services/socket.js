@@ -30,6 +30,14 @@ export const socketService = {
     confirmarCompra(sessioId, seientsIds) {
         socket.emit("compra_finalitzada", { sessio_id: sessioId, seient_ids: seientsIds });
     },
+    
+    // Avisar que se ha creado, editado o borrado una película
+    notificarCanviPelicules() {
+        if (!socket.connected) {
+            socket.connect();
+        }
+        socket.emit("notificar_canvi_pelicules");
+    },
 
     // Desconectar al salir de la página
     desconnectar() {

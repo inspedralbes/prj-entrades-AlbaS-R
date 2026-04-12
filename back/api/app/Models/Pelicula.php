@@ -11,8 +11,20 @@ class Pelicula extends Model
 
     protected $table = 'pelicules';
 
-    protected $guarded = []; 
-    public function sessions() {
+    protected $fillable = [
+        'titol',
+        'descripcio',
+        'any',
+        'imatge_url',
+        'genere',
+        'director',
+        'actors',
+        'durada',
+        'rating',
+        'idioma',
+        'edat_recomanada',
+        'imdb_id'
+    ];    public function sessions() {
         return $this->hasMany(Sessio::class);
     }
 }

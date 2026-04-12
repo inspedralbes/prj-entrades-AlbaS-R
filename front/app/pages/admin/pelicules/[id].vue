@@ -106,6 +106,8 @@
 import { ref, onMounted } from 'vue';
 import { api } from '../../../../services/api.js'; 
 import { useRoute } from 'vue-router';
+import { socketService } from '../../../../services/socket';
+
 
 // Assignem el middleware de seguretat
 definePageMeta({
@@ -173,14 +175,14 @@ const guardarCambios = async () => {
         
         // Si s'ha adjuntat un arxiu, el pugem; altrament mantenim l'adreça URL ja existent
         if (archivoImagen.value) {
-            formData.append('imagen_archivo', archivoImagen.value);
+            formData.append('imatge_url', archivoImagen.value);
         } else if (form.value.imatge_url) {
             formData.append('imatge_url', form.value.imatge_url);
         }
 
         await api.actualitzarPelicula(id_pelicula, formData);
         alert("Pel·lícula actualitzada correctament!");
-        
+        socketService.notificarCanviPelicules();
         // Recarreguem la llista de dades a la vista
         await cargarTodo(); 
     } catch(e) {

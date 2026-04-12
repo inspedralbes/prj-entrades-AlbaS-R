@@ -37,11 +37,11 @@ class PeliculaController extends Controller
         $data = $request->except('imatge_url');
         
         // Mirem si hi ha una fotografia per convertir-la físicament
-        if ($request->hasFile('imagen_archivo')) {
-            $path = $request->file('imagen_archivo')->store('cartellera', 'public');
+        if ($request->hasFile('imatge_url')) {
+            $path = $request->file('imatge_url')->store('cartellera', 'public');
             $data['imatge_url'] = 'http://localhost:8000/storage/' . $path;
         } else {
-            // Si li passen un text manual via URL
+            // Si li passen un text manual via URL (per exemple des de l'API o un formulari sense fitxer)
             $data['imatge_url'] = $request->input('imatge_url');
         }
 
@@ -54,8 +54,8 @@ class PeliculaController extends Controller
         $pelicula = Pelicula::findOrFail($id);
         $data = $request->except('imatge_url');
 
-        if ($request->hasFile('imagen_archivo')) {
-            $path = $request->file('imagen_archivo')->store('cartellera', 'public');
+        if ($request->hasFile('imatge_url')) {
+            $path = $request->file('imatge_url')->store('cartellera', 'public');
             $data['imatge_url'] = 'http://localhost:8000/storage/' . $path;
         } else if ($request->has('imatge_url') && $request->input('imatge_url') != 'null') {
             $data['imatge_url'] = $request->input('imatge_url');

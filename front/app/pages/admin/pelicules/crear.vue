@@ -127,12 +127,12 @@ const guardar = async () => {
         
         // Adjuntem l'arxiu físic perquè el backend el processi
         if (archivoImagen.value) {
-            formData.append('imagen_archivo', archivoImagen.value);
+            formData.append('imatge_url', archivoImagen.value);
         }
         
         // Fem la petició a la base de dades
         await api.crearPelicula(formData);
-        
+        socketService.notificarCanviPelicules();
         // Si tot va bé, redirigim forçosament a la llista d'administració
         router.push('/admin/pelicules/llistaPelicules');
     } catch (e) {
