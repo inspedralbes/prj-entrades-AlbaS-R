@@ -1,5 +1,5 @@
 # Stage 1: Build dependencies
-FROM php:8.3-fpm-alpine AS builder
+FROM php:8.4-fpm-alpine AS builder
 
 WORKDIR /var/www
 
@@ -20,7 +20,7 @@ COPY composer.json composer.lock* ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 # --- Stage 2: Production image ---
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 WORKDIR /var/www
 
