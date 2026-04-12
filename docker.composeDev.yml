@@ -1,3 +1,12 @@
+
+
+# Para hacer reiniciar la base de datos cuando hemos cambiado algo
+# docker exec -it laravel_StarMovie php artisan migrate:fresh --seed
+
+# Para el seed de peliculas
+# docker exec -it laravel_StarMovie php artisan db:seed --class=PeliculesSeeder
+
+
 services:
   db:
     image: mysql:8.0
