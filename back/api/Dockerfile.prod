@@ -35,6 +35,9 @@ COPY . .
 # Copy vendor from builder
 COPY --from=builder /var/www/vendor ./vendor
 
+# Copiar composer desde la etapa de builder para poder optimizar el autoloader
+COPY --from=builder /usr/bin/composer /usr/bin/composer
+
 # Optimize Laravel for production
 RUN touch database/database.sqlite \
     && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
