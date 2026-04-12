@@ -5,6 +5,12 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt'
   ],
+  runtimeConfig: {
+    public: {
+      apiUrl: '', // NUXT_PUBLIC_API_URL
+      socketUrl: '', // NUXT_PUBLIC_SOCKET_URL
+    }
+  },
   vite: {
     server: {
       watch: {
