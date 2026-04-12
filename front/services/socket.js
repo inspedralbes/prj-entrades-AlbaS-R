@@ -1,48 +1,60 @@
 import { io } from "socket.io-client";
 
 // Conectamos con el servidor de WebSockets
-const socket = io("http://localhost:3001", {
-    autoConnect: false
-});
+let socketInstance = null;
+
+const getSocket = () => {
+    if (socketInstance) return socketInstance;
+    
+    const config = useRuntimeConfig();
+    const url = config.public.socketUrl || "http://localhost:3001";
+    
+    socketInstance = io(url, {
+        autoConnect: false
+    });
+    return socketInstance;
+};
 
 export const socketService = {
-    socket,
+    get socket() {
+        return getSocket();
+    },
 
     // Función para conectar y entrar en una sala
     entrarASessio(sessioId) {
-        if (!socket.connected) {
-            socket.connect();
+        if (!this.socket.connected) {
+            this.socket.connect();
         }
-        socket.emit("join_session", sessioId);
+        this.socket.emit("join_session", sessioId);
     },
 
     // Avisar que hemos clicado un asiento
     marcarSeient(sessioId, seientId) {
-        socket.emit("seleccionar_seient", { sessio_id: sessioId, seient_id: seientId });
+        this.socket.emit("seleccionar_seient", { sessio_id: sessioId, seient_id: seientId });
     },
 
     // Avisar que hemos soltado un asiento
     desmarcarSeient(sessioId, seientId) {
-        socket.emit("deseleccionar_seient", { sessio_id: sessioId, seient_id: seientId });
+        this.socket.emit("deseleccionar_seient", { sessio_id: sessioId, seient_id: seientId });
     },
 
     // Avisar que la compra ha tenido éxito
     confirmarCompra(sessioId, seientsIds) {
-        socket.emit("compra_finalitzada", { sessio_id: sessioId, seient_ids: seientsIds });
+        this.socket.emit("compra_finalitzada", { sessio_id: sessioId, seient_ids: seientsIds });
     },
     
     // Avisar que se ha creado, editado o borrado una película
     notificarCanviPelicules() {
-        if (!socket.connected) {
-            socket.connect();
+        if (!this.socket.connected) {
+            this.socket.connect();
         }
-        socket.emit("notificar_canvi_pelicules");
+        this.socket.emit("notificar_canvi_pelicules");
     },
 
     // Desconectar al salir de la página
     desconnectar() {
-        if (socket.connected) {
-            socket.disconnect();
+        if (this.socket.connected) {
+            this.socket.disconnect();
         }
     }
 };
