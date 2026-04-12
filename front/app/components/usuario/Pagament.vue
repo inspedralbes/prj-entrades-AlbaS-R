@@ -129,7 +129,6 @@ function calcularPreuTotal() {
 function formatarData(dataHora) {
   if (!dataHora) return "";
   try {
-    // Si la data ve amb una 'T' al mig (ISO), la canviem per un espai per separar-ho bé
     const formatNet = dataHora.replace('T', ' ');
     const parts = formatNet.split(' ');
     const data = parts[0].split('-').reverse().join('/');

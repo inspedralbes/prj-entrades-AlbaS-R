@@ -25,7 +25,7 @@ class SessioController extends Controller
         return response()->json($sessions);
     }
 
-    // Màgia: Retornem la sessió + la seva sala + i el plànol de seients ocupats
+    //Retornem la sessió + la seva sala + i el plànol de seients ocupats
     public function show($id)
     {
         // Busquem la sessió demanada amb la seva peli i sala
@@ -37,16 +37,51 @@ class SessioController extends Controller
         // Mirem a la taula Entrades quins seients ja han estat comprats EXACTAMENT per aquesta sessió
         $seientsCompratsIds = Entrada::where('sessio_id', $id)->pluck('seient_id')->toArray();
         
-        // Creem el "variable virtual" anomenat ocupat per pintar al Frontend
-        $seientsSala->transform(function ($seient) use ($seientsCompratsIds) {
-            $seient->ocupat = in_array($seient->id, $seientsCompratsIds);
-            return $seient;
-        });
+        
+        // 1. Recorrem tots els seients de la sala amb un bucle FOR clàssic (de 0 fins a la quantitat de seients que hi hagi)
+        for ($i = 0; $i < count($seientsSala); $i++) {
+            
+            // Per defecte comencem suposant que el seient NO està ocupat (fals)
+            $es_ocupat = false;
+            
+            // 2. Amb un segon bucle intern, busquem dins la llista de Bitllets Comprats
+            for ($j = 0; $j < count($seientsCompratsIds); $j++) {
+                
+                // Si l'ID del seient de la sala coincideix amb algun ID comprat
+                if ($seientsSala[$i]->id == $seientsCompratsIds[$j]) {
+                    // Marquem el seient com a venut
+                    $es_ocupat = true;
+                    // Trenquem aquest bucle petit per no perdre més el temps buscant (el seient ja l'hem trobat)
+                    break;
+                }
+            }
+            // I finalment, desem el resultat per aquest seient actuant exactament igual que el transform
+            $seientsSala[$i]->ocupat = $es_ocupat;
+        }
 
         // Ho retornem tot ajuntat endreçadament pel frontend
         return response()->json([
             'sessio' => $sessio,
             'seients_mapa' => $seientsSala
         ]);
+    }
+
+        // Part d'administracio
+    public function store(Request $request)
+    {
+        $novaSessio = Sessio::create($request->all());
+        return response()->json($novaSessio, 201);
+    }
+    public function update(Request $request, $id)
+    {
+        $sessio = Sessio::findOrFail($id);
+        $sessio->update($request->all());
+        return response()->json($sessio);
+    }
+    public function destroy($id)
+    {
+        $sessio = Sessio::findOrFail($id);
+        $sessio->delete();
+        return response()->json(['message' => 'Sessió eliminada amb èxit']);
     }
 }
