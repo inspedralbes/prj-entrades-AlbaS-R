@@ -8,6 +8,7 @@ services:
       - "8080:80"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./back/api:/var/www
       - ./back/api/public:/var/www/public:ro
     depends_on:
       - front
