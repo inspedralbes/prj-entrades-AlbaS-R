@@ -1,0 +1,23 @@
+name: Manual CLI Commands
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Command to run (e.g., artisan migrate:seed)'
+        required: true
+        default: 'ls -la'
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Remote Command
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd ~/TR3
+            docker exec star_movie_api ${{ github.event.inputs.command }}
