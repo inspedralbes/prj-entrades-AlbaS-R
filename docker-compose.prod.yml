@@ -26,7 +26,7 @@ services:
       - "443:443"
     volumes:
       - nginx_secrets:/etc/letsencrypt
-      - ./nginx/default.conf:/etc/nginx/user_conf.d
+      - ./nginx/default.conf:/etc/nginx/user_conf.d/default.conf:ro
       - ./back/api:/var/www
       - ./back/api/public:/var/www/public:ro
     depends_on:
