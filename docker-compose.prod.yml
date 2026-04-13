@@ -27,7 +27,7 @@ services:
     volumes:
       - nginx_secrets:/etc/letsencrypt
       - ./nginx/default.conf:/etc/nginx/user_conf.d/default.conf:ro
-      - ./back/api:/var/www
+      - ./back/api:/var/www/api
       - ./back/api/public:/var/www/public:ro
     depends_on:
       - front
