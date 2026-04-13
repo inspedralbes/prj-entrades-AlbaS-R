@@ -21,15 +21,15 @@
 
           <div v-if="menuObert" class="menu-desplegable">
             <NuxtLink to="/usuario/entrades" class="opcio-menu" @click="menuObert = false">
-               LES MEVES RESERVES
+              LES MEVES RESERVES
             </NuxtLink>
             <NuxtLink v-if="authStore.usuariActual?.is_admin" to="/admin" class="opcio-menu groc-text"
               @click="menuObert = false">
-               GESTIÓ ADMIN
+              GESTIÓ ADMIN
             </NuxtLink>
             <div class="separador"></div>
-            <button class="opcio-menu sortir" @click="handleLogout">
-               SORTIR
+            <button class="opcio-menu sortir" @click="handleLogout" to="/usuario">
+              SORTIR
             </button>
           </div>
         </div>
