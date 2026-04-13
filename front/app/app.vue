@@ -28,9 +28,9 @@
               GESTIÓ ADMIN
             </NuxtLink>
             <div class="separador"></div>
-            <button class="opcio-menu sortir" @click="handleLogout" to="/usuario">
+            <NuxtLink class="opcio-menu sortir" @click="handleLogout" to="/usuario">
               SORTIR
-            </button>
+            </NuxtLink>
           </div>
         </div>
       </nav>
