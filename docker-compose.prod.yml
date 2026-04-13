@@ -19,8 +19,6 @@ services:
     image: jonasal/nginx-certbot:latest
     container_name: star_movie_nginx
     restart: unless-stopped
-    environment:
-      - CERTBOT_EMAIL
     env_file:
       - ./nginx/certbot.env
     ports:
