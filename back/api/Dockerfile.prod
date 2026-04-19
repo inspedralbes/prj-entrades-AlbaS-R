@@ -1,0 +1,52 @@
+# Stage 1: Build dependencies
+FROM php:8.4-fpm-alpine AS builder
+
+WORKDIR /var/www
+
+# Instalador de extensiones de PHP (mucho más fiable en Alpine)
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN chmod +x /usr/local/bin/install-php-extensions
+
+# Instalar extensiones necesarias
+RUN install-php-extensions pdo pdo_mysql zip bcmath mbstring intl gd
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy only composer files to cache layer
+COPY composer.json composer.lock* ./
+
+# Install production dependencies
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+
+# --- Stage 2: Production image ---
+FROM php:8.4-fpm-alpine
+
+WORKDIR /var/www
+
+# Re-instalar extensiones en la imagen final (o copiar los binarios, pero install-php-extensions es más limpio)
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN chmod +x /usr/local/bin/install-php-extensions && \
+    install-php-extensions pdo pdo_mysql zip bcmath mbstring intl gd
+
+# Copy application from local context
+COPY . .
+
+# Copy vendor from builder
+COPY --from=builder /var/www/vendor ./vendor
+
+# Copiar composer desde la etapa de builder para poder optimizar el autoloader
+COPY --from=builder /usr/bin/composer /usr/bin/composer
+
+# Optimize Laravel for production
+RUN touch database/database.sqlite \
+    && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+# Generate optimized autoloader
+RUN composer dump-autoload --optimize --no-dev
+
+# Expose port 9000 for PHP-FPM
+EXPOSE 9000
+
+CMD ["php-fpm"]
